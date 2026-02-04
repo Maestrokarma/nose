@@ -2,34 +2,121 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>para jessith</title>
+    <title>Efecto Texto</title>
     <style>
         body {
             margin: 0;
-            padding: 0;
-            background-color: #000;
-            color: #fff;
             height: 100vh;
+            background: radial-gradient(circle at top, #111, #000);
             display: flex;
             justify-content: center;
             align-items: center;
-            font-family: Arial, Helvetica, sans-serif;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
         }
 
-        .texto-central {
-            font-size: 80px;
-            font-weight: bold;
-            text-transform: uppercase;
+        .contenedor {
             text-align: center;
-            letter-spacing: 4px;
+            cursor: pointer;
+        }
+
+        .texto {
+            font-size: 90px;
+            font-weight: 900;
+            letter-spacing: 6px;
+            color: white;
+            display: inline-flex;
+            user-select: none;
+        }
+
+        .letra {
+            display: inline-block;
+            transition: transform 0.8s ease, opacity 0.8s ease;
+        }
+
+        .desarmado .letra {
+            transform: translate(
+                calc(-150px + 300px * random()),
+                calc(-150px + 300px * random())
+            ) rotate(calc(-180deg + 360deg * random()));
+            opacity: 0;
+        }
+
+        /* Efecto brillo */
+        .texto::after {
+            content: '';
+            display: block;
+            height: 4px;
+            margin-top: 15px;
+            background: linear-gradient(90deg, transparent, white, transparent);
+            opacity: 0.6;
+        }
+
+        /* Fondo con partículas simples */
+        .particula {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            opacity: 0.2;
+            animation: flotar 10s linear infinite;
+        }
+
+        @keyframes flotar {
+            from {
+                transform: translateY(100vh);
+            }
+            to {
+                transform: translateY(-10vh);
+            }
         }
     </style>
 </head>
 <body>
 
-    <div class="texto-central">
-        TE LA EMPUJO
-    </div>
+<div class="contenedor" id="contenedor">
+    <div class="texto" id="texto"></div>
+</div>
+
+<script>
+    const frase = "TE LA EMPUJO";
+    const texto = document.getElementById("texto");
+    const contenedor = document.getElementById("contenedor");
+
+    // Crear letras individuales
+    frase.split("").forEach(letra => {
+        const span = document.createElement("span");
+        span.classList.add("letra");
+        span.textContent = letra === " " ? "\u00A0" : letra;
+        texto.appendChild(span);
+    });
+
+    // Click para desarmar
+    let desarmado = false;
+    contenedor.addEventListener("click", () => {
+        desarmado = !desarmado;
+        texto.classList.toggle("desarmado", desarmado);
+
+        document.querySelectorAll(".letra").forEach(letra => {
+            const x = Math.random() * 400 - 200;
+            const y = Math.random() * 400 - 200;
+            const r = Math.random() * 360 - 180;
+            letra.style.transform = desarmado
+                ? `translate(${x}px, ${y}px) rotate(${r}deg)`
+                : `translate(0, 0) rotate(0deg)`;
+            letra.style.opacity = desarmado ? 0 : 1;
+        });
+    });
+
+    // Crear partículas de fondo
+    for (let i = 0; i < 80; i++) {
+        const p = document.createElement("div");
+        p.classList.add("particula");
+        p.style.left = Math.random() * 100 + "vw";
+        p.style.animationDuration = 5 + Math.random() * 10 + "s";
+        document.body.appendChild(p);
+    }
+</script>
 
 </body>
 </html>
